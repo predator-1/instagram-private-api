@@ -1,4 +1,4 @@
-import { Response } from 'request';
+import { Response } from 'got';
 
 export type IgAppModule =
   | 'feed_timeline' //  "Timeline" tab
@@ -27,4 +27,4 @@ export type IgAppModule =
   | 'story_camera_music_overlay_pre_capture'
   | string;
 
-export type IgResponse<Body> = Pick<Response, Exclude<keyof Response, 'body'>> & { body: Body };
+export type IgResponse<Body> = Pick<Response<object>, Exclude<keyof Response<object>, 'body'>> & { body: Body };

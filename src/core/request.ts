@@ -2,8 +2,6 @@ import { defaultsDeep, inRange, random } from 'lodash';
 import { createHmac } from 'crypto';
 import { Subject } from 'rxjs';
 import { AttemptOptions, retry } from '@lifeomic/attempt';
-import * as request from 'request-promise';
-import { Options, Response } from 'request';
 import { IgApiClient } from './client';
 import {
   IgActionSpamError,
@@ -18,6 +16,26 @@ import {
 } from '../errors';
 import JSONbigInt = require('json-bigint');
 import { IgResponse } from '../types/common.types';
+import * as got from 'got';
+import { Response, GotOptions, GotFormOptions, GotBodyOptions } from 'got';
+import { httpsOverHttp } from 'tunnel';
+import * as FormData from 'form-data';
+
+interface IOptions {
+  url: string;
+  qs?: any;
+  method?: string;
+  headers?: { [key: string]: any };
+  form?: Record<string, any>;
+}
+
+interface IOptionsFormData extends IOptions {
+  formData: FormData;
+}
+
+interface IOptionsBody extends IOptions {
+  body: Buffer;
+}
 
 const JSONbigString = JSONbigInt({ storeAsString: true });
 
@@ -34,40 +52,70 @@ export class Request {
   attemptOptions: Partial<AttemptOptions<any>> = {
     maxAttempts: 1,
   };
-  defaults: Partial<Options> = {};
+  defaults: Partial<GotBodyOptions<string>> = {
+    baseUrl: 'https://i.instagram.com/',
+    rejectUnauthorized: false,
+    decompress: true,
+    headers: this.getDefaultHeaders(),
+    hooks: {
+      afterResponse: [
+        response => {
+          if (response.body) {
+            try {
+              response.body = JSONbigString.parse(response.body as string);
+            } catch (e) {
+              if (inRange(response.statusCode, 200, 299)) {
+                throw e;
+              }
+            }
+          }
+          return response;
+        },
+      ],
+    },
+  };
 
   constructor(private client: IgApiClient) {}
 
-  private static requestTransform(body, response: Response, resolveWithFullResponse) {
-    try {
-      // Sometimes we have numbers greater than Number.MAX_SAFE_INTEGER in json response
-      // To handle it we just wrap numbers with length > 15 it double quotes to get strings instead
-      response.body = JSONbigString.parse(body);
-    } catch (e) {
-      if (inRange(response.statusCode, 200, 299)) {
-        throw e;
-      }
-    }
-    return resolveWithFullResponse ? response : response.body;
+  public async sendFormData<T = any>(incomeOptions: IOptionsFormData): Promise<IgResponse<T>> {
+    return await this.sendRequest({ body: incomeOptions.formData } as GotBodyOptions<string>, incomeOptions);
   }
 
-  public async send<T = any>(userOptions: Options): Promise<IgResponse<T>> {
-    const options = defaultsDeep(
-      userOptions,
+  public async sendBody<T = any>(incomeOptions: IOptionsBody): Promise<IgResponse<T>> {
+    return await this.sendRequest({ body: incomeOptions.body } as GotBodyOptions<string>, incomeOptions);
+  }
+
+  public async send<T = any>(incomeOptions: IOptions): Promise<IgResponse<T>> {
+    if (incomeOptions.form) {
+      const options: GotFormOptions<string> = {
+        body: incomeOptions.form,
+        form: true,
+      };
+      return await this.sendRequest(options, incomeOptions);
+    }
+  }
+
+  private async sendRequest<T = any>(data: GotOptions<string>, incomeOptions: IOptions): Promise<IgResponse<T>> {
+    if (this.client.state.proxyUrl) {
+      const prx = this.client.state.proxyUrl.split(':');
+      data.agent = httpsOverHttp({
+        proxy: {
+          host: prx[0],
+          port: parseInt(prx[1], 10),
+        },
+      });
+    }
+    const options: GotOptions<string> = defaultsDeep(
+      data,
       {
-        baseUrl: 'https://i.instagram.com/',
-        resolveWithFullResponse: true,
-        proxy: this.client.state.proxyUrl,
-        simple: false,
-        transform: Request.requestTransform,
-        jar: this.client.state.cookieJar,
-        strictSSL: false,
-        gzip: true,
-        headers: this.getDefaultHeaders(),
+        query: incomeOptions.qs,
+        method: incomeOptions.method,
+        headers: incomeOptions.headers,
+        cookieJar: this.client.state.cookieJar,
       },
       this.defaults,
     );
-    const response = await this.faultTolerantRequest(options);
+    const response = await this.faultTolerantRequest(incomeOptions.url, options);
     process.nextTick(() => this.end$.next());
     if (response.body.status === 'ok') {
       return response;
@@ -76,6 +124,7 @@ export class Request {
     process.nextTick(() => this.error$.next(error));
     throw error;
   }
+
   public signature(data: string) {
     return createHmac('sha256', this.client.state.signatureKey)
       .update(data)
@@ -104,7 +153,7 @@ export class Request {
     return `${signature}\n${body}\n`;
   }
 
-  private handleResponseError(response: Response): IgClientError {
+  private handleResponseError(response: Response<any>): IgClientError {
     const json = response.body;
     if (json.spam) {
       return new IgActionSpamError(response);
@@ -130,15 +179,15 @@ export class Request {
     return new IgResponseError(response);
   }
 
-  private async faultTolerantRequest(options: Options) {
+  private async faultTolerantRequest(url: string, options: GotOptions<string>) {
     try {
-      return await retry(async () => request(options), this.attemptOptions);
+      return await retry(async () => got(url, options), this.attemptOptions);
     } catch (err) {
       throw new IgNetworkError(err);
     }
   }
 
-  private getDefaultHeaders() {
+  private getDefaultHeaders(): { [key: string]: any } {
     // TODO: unquoted Host and Connection?!
     return {
       'User-Agent': this.client.state.appUserAgent,

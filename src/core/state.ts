@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import * as Bluebird from 'bluebird';
 import * as Chance from 'chance';
-import { jar } from 'request';
 import { Cookie, CookieJar, MemoryCookieStore } from 'tough-cookie';
 import * as devices from '../samples/devices.json';
 import * as builds from '../samples/builds.json';
@@ -55,7 +54,7 @@ export class State {
   deviceId: string;
   proxyUrl: string;
   cookieStore = new MemoryCookieStore();
-  cookieJar = jar(this.cookieStore);
+  cookieJar: CookieJar = new CookieJar();
   checkpoint: CheckpointResponse | null = null;
   challenge: ChallengeStateResponse | null = null;
   clientSessionIdLifetime: number = 1200000;
@@ -141,7 +140,7 @@ export class State {
   }
 
   public extractCookie(key: string): Cookie | null {
-    const cookies = this.cookieJar.getCookies(HOST);
+    const cookies = this.cookieJar.getCookiesSync(HOST);
     return _.find(cookies, { key }) || null;
   }
 
@@ -165,11 +164,11 @@ export class State {
   }
 
   public async deserializeCookieJar(cookies: string) {
-    this.cookieJar['_jar'] = await Bluebird.fromCallback(cb => CookieJar.deserialize(cookies, this.cookieStore, cb));
+    this.cookieJar = await Bluebird.fromCallback(cb => CookieJar.deserialize(cookies, this.cookieStore, cb));
   }
 
   public async serializeCookieJar(): Promise<CookieJar.Serialized> {
-    return Bluebird.fromCallback(cb => this.cookieJar['_jar'].serialize(cb));
+    return Bluebird.fromCallback(cb => this.cookieJar.serialize(cb));
   }
 
   public generateDevice(seed: string): void {

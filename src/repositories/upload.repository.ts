@@ -22,7 +22,7 @@ export class UploadRepository extends Repository {
     }
     const name = `${uploadId}_0_-${random(1000000000, 9999999999)}`;
     const contentLength = options.file.byteLength;
-    const { body } = await this.client.request.send<UploadRepositoryPhotoResponseRootObject>({
+    const { body } = await this.client.request.sendBody<UploadRepositoryPhotoResponseRootObject>({
       url: `/rupload_igphoto/${name}`,
       method: 'POST',
       headers: {
@@ -66,7 +66,7 @@ export class UploadRepository extends Repository {
       ruploadParams.for_album = '1';
     }
 
-    const { body } = await this.client.request.send({
+    const { body } = await this.client.request.sendBody({
       url: `/rupload_igvideo/${name}/`,
       method: 'POST',
       qs: {

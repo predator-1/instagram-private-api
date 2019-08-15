@@ -20,6 +20,7 @@ import { AccountTwoFactorLoginOptions } from '../types/account.two-factor-login.
 import { defaultsDeep } from 'lodash';
 import { IgSignupBlockError } from '../errors/ig-signup-block.error';
 import Bluebird = require('bluebird');
+import * as FormData from 'form-data';
 
 export class AccountRepository extends Repository {
   public async login(username: string, password: string): Promise<AccountRepositoryLoginResponseLogged_in_user> {
@@ -161,19 +162,18 @@ export class AccountRepository extends Repository {
       _uid: this.client.state.cookieUserId,
       _uuid: this.client.state.uuid,
     });
-    const { body } = await this.client.request.send<AccountRepositoryCurrentUserResponseRootObject>({
+    const formData = new FormData();
+    for (let name in signedParameters) {
+      formData.append(name, signedParameters[name]);
+    }
+    formData.append('profile_pic', stream, {
+      filename: 'profile_pic',
+      contentType: 'application/octet-stream',
+    });
+    const { body } = await this.client.request.sendFormData<AccountRepositoryCurrentUserResponseRootObject>({
       url: '/api/v1/accounts/change_profile_picture/',
       method: 'POST',
-      formData: {
-        ...signedParameters,
-        profile_pic: {
-          value: stream,
-          options: {
-            filename: 'profile_pic',
-            contentType: 'application/octet-stream',
-          },
-        },
-      },
+      formData,
     });
     return body;
   }
