@@ -55,7 +55,7 @@ export class Request {
   defaults: Partial<GotBodyOptions<string>> = {
     baseUrl: 'https://i.instagram.com/',
     rejectUnauthorized: false,
-    decompress: true,
+    decompress: false,
     headers: this.getDefaultHeaders(),
     hooks: {
       afterResponse: [
@@ -93,6 +93,7 @@ export class Request {
       };
       return await this.sendRequest(options, incomeOptions);
     }
+    return await this.sendRequest({}, incomeOptions);
   }
 
   private async sendRequest<T = any>(data: GotOptions<string>, incomeOptions: IOptions): Promise<IgResponse<T>> {
