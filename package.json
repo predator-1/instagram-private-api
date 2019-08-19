@@ -53,6 +53,7 @@
     "luxon": "^1.12.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.5.2",
+    "socks-proxy-agent": "^4.0.2",
     "tough-cookie": "^2.5.0",
     "ts-custom-error": "^2.2.2",
     "ts-xor": "^1.0.6",
