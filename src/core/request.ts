@@ -20,6 +20,8 @@ import * as got from 'got';
 import { Response, GotOptions, GotFormOptions, GotBodyOptions } from 'got';
 import { httpsOverHttp } from 'tunnel';
 import * as FormData from 'form-data';
+import * as SocksProxyAgent from 'socks-proxy-agent';
+import * as url from 'url';
 
 interface IOptions {
   url: string;
@@ -98,13 +100,25 @@ export class Request {
 
   private async sendRequest<T = any>(data: GotOptions<string>, incomeOptions: IOptions): Promise<IgResponse<T>> {
     if (this.client.state.proxyUrl) {
-      const prx = this.client.state.proxyUrl.split(':');
-      data.agent = httpsOverHttp({
-        proxy: {
-          host: prx[0],
-          port: parseInt(prx[1], 10),
-        },
-      });
+      const proxy = url.parse(this.client.state.proxyUrl);
+      if (proxy.protocol === 'http:' || proxy.protocol === 'https:') {
+        data.agent = httpsOverHttp({
+          proxy: {
+            host: proxy.hostname,
+            port: parseInt(proxy.port, 10),
+            proxyAuth: proxy.auth,
+          },
+        });
+      } else if (proxy.protocol === 'socks:') {
+        data.agent = new SocksProxyAgent(this.client.state.proxyUrl);
+      }
+      // const prx = this.client.state.proxyUrl.split(':');
+      // data.agent = httpsOverHttp({
+      //   proxy: {
+      //     host: prx[0],
+      //     port: parseInt(prx[1], 10),
+      //   },
+      // });
     }
     const options: GotOptions<string> = defaultsDeep(
       data,
