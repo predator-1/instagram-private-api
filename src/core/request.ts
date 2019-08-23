@@ -79,26 +79,41 @@ export class Request {
 
   constructor(private client: IgApiClient) {}
 
-  public async sendFormData<T = any>(incomeOptions: IOptionsFormData): Promise<IgResponse<T>> {
-    return await this.sendRequest({ body: incomeOptions.formData } as GotBodyOptions<string>, incomeOptions);
+  public async sendFormData<T = any>(
+    incomeOptions: IOptionsFormData,
+    onlyCheckHttpStatus?: boolean,
+  ): Promise<IgResponse<T>> {
+    return await this.sendRequest(
+      { body: incomeOptions.formData } as GotBodyOptions<string>,
+      incomeOptions,
+      onlyCheckHttpStatus,
+    );
   }
 
-  public async sendBody<T = any>(incomeOptions: IOptionsBody): Promise<IgResponse<T>> {
-    return await this.sendRequest({ body: incomeOptions.body } as GotBodyOptions<string>, incomeOptions);
+  public async sendBody<T = any>(incomeOptions: IOptionsBody, onlyCheckHttpStatus?: boolean): Promise<IgResponse<T>> {
+    return await this.sendRequest(
+      { body: incomeOptions.body } as GotBodyOptions<string>,
+      incomeOptions,
+      onlyCheckHttpStatus,
+    );
   }
 
-  public async send<T = any>(incomeOptions: IOptions): Promise<IgResponse<T>> {
+  public async send<T = any>(incomeOptions: IOptions, onlyCheckHttpStatus?: boolean): Promise<IgResponse<T>> {
     if (incomeOptions.form) {
       const options: GotFormOptions<string> = {
         body: incomeOptions.form,
         form: true,
       };
-      return await this.sendRequest(options, incomeOptions);
+      return await this.sendRequest(options, incomeOptions, onlyCheckHttpStatus);
     }
-    return await this.sendRequest({}, incomeOptions);
+    return await this.sendRequest({}, incomeOptions, onlyCheckHttpStatus);
   }
 
-  private async sendRequest<T = any>(data: GotOptions<string>, incomeOptions: IOptions): Promise<IgResponse<T>> {
+  private async sendRequest<T = any>(
+    data: GotOptions<string>,
+    incomeOptions: IOptions,
+    onlyCheckHttpStatus: boolean,
+  ): Promise<IgResponse<T>> {
     if (this.client.state.proxyUrl) {
       const proxy = url.parse(this.client.state.proxyUrl);
       if (proxy.protocol === 'http:' || proxy.protocol === 'https:') {
@@ -132,7 +147,7 @@ export class Request {
     );
     const response = await this.faultTolerantRequest(incomeOptions.url, options);
     process.nextTick(() => this.end$.next());
-    if (response.body.status === 'ok') {
+    if (response.body.status === 'ok' || (onlyCheckHttpStatus && response.statusCode === 200)) {
       return response;
     }
     const error = this.handleResponseError(response);
