@@ -18,6 +18,21 @@ export abstract class Feed<Response = any, Item = any> extends Repository {
   public get items$() {
     return this.observable();
   }
+
+  public getItems(attemptOptions?: Partial<AttemptOptions<any>>) {
+    return retry<Item[]>(() => this.items(), {
+      handleError(error, context) {
+        // If instagram just tells us to wait - we are waiting.
+        if (error instanceof IgResponseError && [400, 429, 500, 502].includes(error.response.statusCode)) {
+          return;
+        } else {
+          context.abort();
+        }
+      },
+      ...(attemptOptions || this.attemptOptions),
+    });
+  }
+
   public observable(semaphore?: () => Promise<any>, attemptOptions?: Partial<AttemptOptions<any>>) {
     return new Observable<Item[]>(observer => {
       let subscribed = true;
