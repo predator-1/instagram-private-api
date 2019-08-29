@@ -59,6 +59,7 @@ export class Request {
     rejectUnauthorized: false,
     decompress: false,
     headers: this.getDefaultHeaders(),
+    throwHttpErrors: false,
     hooks: {
       afterResponse: [
         response => {
