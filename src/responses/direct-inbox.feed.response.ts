@@ -50,6 +50,7 @@ export class DirectInboxFeedResponseThreadsItem {
   oldest_cursor: string;
   is_spam: boolean;
   last_permanent_item: DirectInboxFeedResponseLastPermanentItem;
+  read_state: number;
 }
 export interface DirectInboxFeedResponseUsersItem {
   pk: number;
