@@ -1,11 +1,20 @@
 import * as urlRegex from 'url-regex';
 import { Entity } from '../core/entity';
-import { DirectThreadBroadcastPhotoOptions } from '../types/direct-thread.broadcast-photo.options';
-import { DirectThreadBroadcastOptions } from '../types/direct-thread.broadcast.options';
+import { DirectThreadBroadcastPhotoOptions, DirectThreadBroadcastVideoOptions } from '../types';
+import { DirectThreadBroadcastOptions } from '../types';
+import { IgClientError } from '../errors';
+import { PublishService } from '../services/publish.service';
 
 export class DirectThreadEntity extends Entity {
   threadId: string = null;
   userIds: string[] = null;
+
+  public async deleteItem(itemId: string | number) {
+    if (!this.threadId) {
+      throw new IgClientError('threadId was null.');
+    }
+    return this.client.directThread.deleteItem(this.threadId, itemId);
+  }
 
   public async broadcastText(text: string) {
     const urls = text.match(urlRegex({ strict: false }));
@@ -16,6 +25,15 @@ export class DirectThreadEntity extends Entity {
       item: 'text',
       form: {
         text,
+      },
+    });
+  }
+
+  public async broadcastProfile(id: number | string) {
+    return await this.broadcast({
+      item: 'profile',
+      form: {
+        profile_user_id: id,
       },
     });
   }
@@ -40,6 +58,26 @@ export class DirectThreadEntity extends Entity {
       form: {
         allow_full_aspect_ratio: options.allowFullAspectRatio || true,
         upload_id,
+      },
+    });
+  }
+
+  public async broadcastVideo(options: DirectThreadBroadcastVideoOptions) {
+    const uploadId = options.uploadId || Date.now().toString();
+    const videoInfo = PublishService.getVideoInfo(options.video);
+    await this.client.upload.video({
+      video: options.video,
+      uploadId,
+      isDirect: true,
+      ...videoInfo,
+    });
+
+    return await this.broadcast({
+      item: 'configure_video',
+      form: {
+        video_result: '',
+        upload_id: uploadId,
+        sampled: typeof options.sampled !== 'undefined' ? options.sampled : true,
       },
     });
   }

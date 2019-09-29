@@ -21,6 +21,7 @@ import {
   SavedFeed,
   StoriesInsightsFeed,
   TagFeed,
+  TagsFeed,
   TimelineFeed,
   UserFeed,
   UsertagsFeed,
@@ -31,6 +32,8 @@ import { IgAppModule } from '../types/common.types';
 import { plainToClassFromExist } from 'class-transformer';
 import * as Chance from 'chance';
 import { PostsInsightsFeedOptions } from '../types';
+import { UserStoryFeed } from '../feeds/user-story.feed';
+import { ListReelMediaViewerFeed } from '../feeds/list-reel-media-viewer.feed';
 
 export class FeedFactory {
   constructor(private client: IgApiClient) {}
@@ -94,6 +97,13 @@ export class FeedFactory {
     return feed;
   }
 
+  public tags(tag: string, tab: 'top' | 'recent' | 'places' = 'top'): TagsFeed {
+    const feed = new TagsFeed(this.client);
+    feed.tag = tag;
+    feed.tab = tab;
+    return feed;
+  }
+
   public location(id: string | number, tab: 'recent' | 'ranked' = 'ranked'): LocationFeed {
     const feed = new LocationFeed(this.client);
     feed.id = id;
@@ -109,6 +119,10 @@ export class FeedFactory {
 
   public reelsMedia(options: { userIds: Array<number | string>; source?: IgAppModule }): ReelsMediaFeed {
     return plainToClassFromExist(new ReelsMediaFeed(this.client), options);
+  }
+
+  public userStory(userId: string | number): UserStoryFeed {
+    return plainToClassFromExist(new UserStoryFeed(this.client), { userId });
   }
 
   public reelsTray(reason: 'pull_to_refresh' | 'cold_start' = 'cold_start'): ReelsTrayFeed {
@@ -170,5 +184,9 @@ export class FeedFactory {
 
   public saved(): SavedFeed {
     return new SavedFeed(this.client);
+  }
+
+  public listReelMediaViewers(mediaId: string): ListReelMediaViewerFeed {
+    return plainToClassFromExist(new ListReelMediaViewerFeed(this.client), { mediaId });
   }
 }

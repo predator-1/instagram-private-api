@@ -24,4 +24,4 @@
 
 • **status**: *string*
 
-*Defined in [responses/status.response.ts:2](https://github.com/dilame/instagram-private-api/blob/01eb399/src/responses/status.response.ts#L2)*
+*Defined in [responses/status.response.ts:2](https://github.com/dilame/instagram-private-api/blob/173bc62/src/responses/status.response.ts#L2)*

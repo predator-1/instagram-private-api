@@ -27,6 +27,8 @@ export type IgAppModule =
   | 'story_camera_music_overlay_pre_capture'
   | 'story_viewer_profile'
   | 'story_viewer_default'
+  | 'find_friends_contacts'
+  | 'explore_people'
   | string;
 
 export type IgResponse<Body> = Pick<Response<object>, Exclude<keyof Response<object>, 'body'>> & { body: Body };

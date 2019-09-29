@@ -52,7 +52,7 @@ export class UploadRepository extends Repository {
 
     const ruploadParams: any = {
       retry_context: JSON.stringify({ num_step_auto_retry: 0, num_reupload: 0, num_step_manual_retry: 0 }),
-      media_type: '2',
+      media_type: options.mediaType || '2',
       xsharing_user_ids: JSON.stringify([]),
       upload_id: uploadId.toString(),
       upload_media_height: height.toString(),
@@ -66,7 +66,11 @@ export class UploadRepository extends Repository {
       ruploadParams.for_album = '1';
     }
 
-    const { body } = await this.client.request.sendBody({
+    if (options.isDirect) {
+      ruploadParams.direct_v2 = '1';
+    }
+
+    const { body } = await this.client.request.send({
       url: `/rupload_igvideo/${name}/`,
       method: 'POST',
       qs: {
