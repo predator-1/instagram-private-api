@@ -70,7 +70,7 @@ export class UploadRepository extends Repository {
       ruploadParams.direct_v2 = '1';
     }
 
-    const { body } = await this.client.request.send({
+    const { body } = await this.client.request.sendBody({
       url: `/rupload_igvideo/${name}/`,
       method: 'POST',
       qs: {

@@ -22,6 +22,7 @@ import { httpsOverHttp } from 'tunnel';
 import * as FormData from 'form-data';
 import * as SocksProxyAgent from 'socks-proxy-agent';
 import * as url from 'url';
+import JSONbigInt = require('json-bigint');
 
 interface IOptions {
   url: string;
@@ -38,7 +39,6 @@ interface IOptionsFormData extends IOptions {
 interface IOptionsBody extends IOptions {
   body: Buffer;
 }
-import JSONbigInt = require('json-bigint');
 
 const JSONbigString = JSONbigInt({ storeAsString: true });
 
