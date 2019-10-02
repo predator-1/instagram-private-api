@@ -188,4 +188,105 @@ export class State {
   private generateTemporaryGuid(seed: string, lifetime: number) {
     return new Chance(`${seed}${this.deviceId}${Math.round(Date.now() / lifetime)}`).guid();
   }
+
+  public async export(): Promise<ExportState> {
+    return {
+      signatureKey: this.signatureKey,
+      signatureVersion: this.signatureVersion,
+      userBreadcrumbKey: this.userBreadcrumbKey,
+      appVersion: this.appVersion,
+      appVersionCode: this.appVersionCode,
+      fbAnalyticsApplicationId: this.fbAnalyticsApplicationId,
+      fbOtaFields: this.fbOtaFields,
+      fbOrcaApplicationId: this.fbOrcaApplicationId,
+      loginExperiments: this.loginExperiments,
+      experiments: this.experiments,
+      supportedCapabilities: this.supportedCapabilities,
+      language: this.language,
+      timezoneOffset: this.timezoneOffset,
+      radioType: this.radioType,
+      capabilitiesHeader: this.capabilitiesHeader,
+      connectionTypeHeader: this.connectionTypeHeader,
+      deviceString: this.deviceString,
+      build: this.build,
+      uuid: this.uuid,
+      phoneId: this.phoneId,
+      adid: this.adid,
+      deviceId: this.deviceId,
+      checkpoint: this.checkpoint,
+      challenge: this.challenge,
+      clientSessionIdLifetime: this.clientSessionIdLifetime,
+      pigeonSessionIdLifetime: this.pigeonSessionIdLifetime,
+      cookies: JSON.stringify(await this.serializeCookieJar()),
+    };
+  }
+
+  public async import(exportState: ExportState): Promise<void> {
+    this.signatureKey = exportState.signatureKey;
+    this.signatureVersion = exportState.signatureVersion;
+    this.userBreadcrumbKey = exportState.userBreadcrumbKey;
+    this.appVersion = exportState.appVersion;
+    this.appVersionCode = exportState.appVersionCode;
+    this.fbAnalyticsApplicationId = exportState.fbAnalyticsApplicationId;
+    this.fbOtaFields = exportState.fbOtaFields;
+    this.fbOrcaApplicationId = exportState.fbOrcaApplicationId;
+    this.loginExperiments = exportState.loginExperiments;
+    this.experiments = exportState.experiments;
+    this.supportedCapabilities = exportState.supportedCapabilities;
+    this.language = exportState.language;
+    this.timezoneOffset = exportState.timezoneOffset;
+    this.radioType = exportState.radioType;
+    this.capabilitiesHeader = exportState.capabilitiesHeader;
+    this.connectionTypeHeader = exportState.connectionTypeHeader;
+    this.deviceString = exportState.deviceString;
+    this.build = exportState.build;
+    this.uuid = exportState.uuid;
+    this.phoneId = exportState.phoneId;
+    this.adid = exportState.adid;
+    this.deviceId = exportState.deviceId;
+    this.checkpoint = exportState.checkpoint;
+    this.challenge = exportState.challenge;
+    this.clientSessionIdLifetime = exportState.clientSessionIdLifetime;
+    this.pigeonSessionIdLifetime = exportState.pigeonSessionIdLifetime;
+    await this.deserializeCookieJar(exportState.cookies);
+  }
+}
+
+export interface ExportState {
+  signatureKey: string;
+  signatureVersion: string;
+  userBreadcrumbKey: string;
+  appVersion: string;
+  appVersionCode: string;
+  fbAnalyticsApplicationId: string;
+  fbOtaFields: string;
+  fbOrcaApplicationId: string;
+  loginExperiments: string;
+  experiments: string;
+  supportedCapabilities: Array<
+    | {
+        name: string;
+        value: string;
+      }
+    | {
+        name: string;
+        value: number;
+      }
+  >;
+  language: string;
+  timezoneOffset: string;
+  radioType: string;
+  capabilitiesHeader: string;
+  connectionTypeHeader: string;
+  deviceString: string;
+  build: string;
+  uuid: string;
+  phoneId: string;
+  adid: string;
+  deviceId: string;
+  cookies: string;
+  checkpoint: CheckpointResponse;
+  challenge: ChallengeStateResponse;
+  clientSessionIdLifetime: number;
+  pigeonSessionIdLifetime: number;
 }
