@@ -1,5 +1,5 @@
 import { Repository } from '../core/repository';
-import { TagRepositorySearchResponseRootObject } from '../responses';
+import { TagRepositorySearchResponseRootObject, TagRepositoryStoryResponseRootObject } from '../responses';
 
 export class TagRepository extends Repository {
   public async search(q: string) {
@@ -22,6 +22,14 @@ export class TagRepository extends Repository {
         tab: tab,
         count: 30,
       },
+    });
+    return body;
+  }
+
+  public async story(id: number | string): Promise<TagRepositoryStoryResponseRootObject> {
+    const { body } = await this.client.request.send<TagRepositoryStoryResponseRootObject>({
+      url: `/api/v1/tags/${id}/story/`,
+      method: 'GET',
     });
     return body;
   }
