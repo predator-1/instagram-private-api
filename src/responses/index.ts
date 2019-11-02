@@ -86,3 +86,4 @@ export * from './address-book.repository.link.response';
 export * from './location.repository.story.response';
 export * from './user-story.feed.response';
 export * from './tag.repository.story.response';
+export * from './media.inline-child-comments.feed.response';

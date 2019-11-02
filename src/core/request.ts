@@ -14,6 +14,7 @@ import {
   IgPrivateUserError,
   IgResponseError,
   IgSentryBlockError,
+  IgUserHasLoggedOutError,
 } from '../errors';
 import { IgResponse } from '../types/common.types';
 import * as got from 'got';
@@ -198,7 +199,10 @@ export class Request {
         this.client.state.checkpoint = json;
         return new IgCheckpointError(response);
       }
-      if (['user_has_logged_out', 'login_required'].includes(json.message)) {
+      if (json.message === 'user_has_logged_out') {
+        return new IgUserHasLoggedOutError(response);
+      }
+      if (json.message === 'login_required') {
         return new IgLoginRequiredError(response);
       }
       if (json.message.toLowerCase() === 'not authorized to view user') {

@@ -1,9 +1,16 @@
 import * as urlRegex from 'url-regex';
 import { Entity } from '../core/entity';
-import { DirectThreadBroadcastPhotoOptions, DirectThreadBroadcastVideoOptions } from '../types';
+import {
+  DirectThreadBroadcastPhotoOptions,
+  DirectThreadBroadcastPhotoStoryOptions,
+  DirectThreadBroadcastReelOptions,
+  DirectThreadBroadcastVideoOptions,
+  DirectThreadBroadcastVideoStoryOptions,
+} from '../types';
 import { DirectThreadBroadcastOptions } from '../types';
-import { IgClientError } from '../errors';
+import { IgClientError, IgResponseError } from '../errors';
 import { PublishService } from '../services/publish.service';
+import * as Bluebird from 'bluebird';
 
 export class DirectThreadEntity extends Entity {
   threadId: string = null;
@@ -26,6 +33,44 @@ export class DirectThreadEntity extends Entity {
       form: {
         text,
       },
+    });
+  }
+
+  /**
+   * This is used when replying to a story (swiping up) and it's creator
+   * @param options
+   */
+  public async broadcastReel(options: DirectThreadBroadcastReelOptions) {
+    return await this.broadcast({
+      item: 'reel_share',
+      form: {
+        media_id: options.mediaId,
+        reel_id: options.reelId || options.mediaId.split('_')[1],
+        text: options.text,
+        entry: 'reel',
+      },
+      qs: {
+        media_type: options.mediaType || 'photo',
+      },
+    });
+  }
+
+  /**
+   * This is used when sharing a story (app: plane/share button) to a thread
+   * @param options
+   */
+  public async broadcastUserStory(options: DirectThreadBroadcastReelOptions) {
+    return await this.broadcast({
+      item: 'story_share',
+      form: {
+        story_media_id: options.mediaId,
+        reel_id: options.reelId || options.mediaId.split('_')[1],
+        text: options.text,
+      },
+      qs: {
+        media_type: options.mediaType || 'photo',
+      },
+      signed: true,
     });
   }
 
@@ -72,6 +117,14 @@ export class DirectThreadEntity extends Entity {
       ...videoInfo,
     });
 
+    await Bluebird.try(() =>
+      this.client.media.uploadFinish({
+        upload_id: uploadId,
+        source_type: '2',
+        video: { length: videoInfo.duration / 1000.0 },
+      }),
+    ).catch(IgResponseError, PublishService.catchTranscodeError(videoInfo, options.transcodeDelay || 4 * 1000));
+
     return await this.broadcast({
       item: 'configure_video',
       form: {
@@ -82,16 +135,29 @@ export class DirectThreadEntity extends Entity {
     });
   }
 
-  public async broadcastStory(file: Buffer) {
-    if (this.threadId === null) {
+  /**
+   * Uploads a story to the thread
+   * The story is either destroyable (view 'once') or 'replayable'
+   * @param input
+   */
+  public async broadcastStory(
+    input: Buffer | DirectThreadBroadcastPhotoStoryOptions | DirectThreadBroadcastVideoStoryOptions,
+  ) {
+    const options = input instanceof Buffer ? { file: input } : input;
+    const baseOptions = {
+      ...options,
+      viewMode: options.viewMode || 'replayable',
+      replyType: options.replyType,
+    };
+    if (this.threadId !== null) {
       return await this.client.publish.story({
-        file,
+        ...baseOptions,
         threadIds: [this.threadId],
       });
     }
-    if (this.userIds === null) {
+    if (this.userIds !== null) {
       return await this.client.publish.story({
-        file,
+        ...baseOptions,
         recipientUsers: this.userIds,
       });
     }
@@ -133,6 +199,8 @@ export class DirectThreadEntity extends Entity {
     const baseParams = {
       item: options.item,
       form: options.form,
+      qs: options.qs,
+      signed: options.signed,
     };
     let params;
     if (this.threadId) {

@@ -9,6 +9,21 @@
 
 ---
 
+# Table of Contents
+
+- [Install](#install)
+- [Support us](#support-us)
+- [Examples](#examples)
+- [Basic Concepts](#basic-concepts)
+  - [Feeds](#feeds)
+  - [Repositories](#repositories)
+  - [Services](#services)
+- [Contribution](#contribution)
+- [Useful Links](#useful-links)
+  - [Special Thanks](#special-thanks)
+  - [Thanks to Contributors](#thanks-to-contributors)
+  - [End User License Agreement (EULA)](#end-user-license-agreement-eula)
+
 # Install
 
 From npm
@@ -87,50 +102,52 @@ Repositories implements low-level atomic operations. Any repository method must 
 
 Keys is a little hints, with it you will be able to get access to repository via `ig.key`.
 
-| Key | Repository class documentation |
-| --- | --- |
-| `account` | [AccountRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_account_repository_.accountrepository.md) |
-| `attribution` | [AttributionRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_attribution_repository_.attributionrepository.md) |
-| `challenge` | [ChallengeRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_challenge_repository_.challengerepository.md) |
-| `consent` | [ConsentRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_consent_repository_.consentrepository.md) |
-| `creatives` | [CreativesRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_creatives_repository_.creativesrepository.md) |
-| `direct` | [DirectRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_direct_repository_.directrepository.md) |
-| `directThread` | [DirectThreadRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_direct_thread_repository_.directthreadrepository.md) |
-| `discover` | [DiscoverRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_discover_repository_.discoverrepository.md) |
-| `fbsearch` | [FbsearchRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_fbsearch_repository_.fbsearchrepository.md) |
-| `friendship` | [FriendshipRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_friendship_repository_.friendshiprepository.md) |
-| `launcher` | [LauncherRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_launcher_repository_.launcherrepository.md) |
-| `linkedAccount` | [LinkedAccountRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_linked_account_repository_.linkedaccountrepository.md) |
-| `live` | [LiveRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_live_repository_.liverepository.md) |
-| `location` | [LocationRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_location_repository_.locationrepository.md) |
-| `locationSearch` | [LocationSearch](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_location_search_repository_.locationsearch.md) |
-| `loom` | [LoomRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_loom_repository_.loomrepository.md) |
-| `media` | [MediaRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_media_repository_.mediarepository.md) |
-| `music` | [MusicRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_music_repository_.musicrepository.md) |
-| `news` | [NewsRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_news_repository_.newsrepository.md) |
-| `qe` | [QeRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_qe_repository_.qerepository.md) |
-| `qp` | [QpRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_qp_repository_.qprepository.md) |
-| `tag` | [TagRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_tag_repository_.tagrepository.md) |
-| `upload` | [UploadRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_upload_repository_.uploadrepository.md) |
-| `user` | [UserRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_user_repository_.userrepository.md) |
-| `zr` | [ZrRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_zr_repository_.zrrepository.md) |
+| Key              | Repository class documentation                                                                                                                                          |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `account`        | [AccountRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_account_repository_.accountrepository.md)                    |
+| `attribution`    | [AttributionRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_attribution_repository_.attributionrepository.md)        |
+| `challenge`      | [ChallengeRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_challenge_repository_.challengerepository.md)              |
+| `consent`        | [ConsentRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_consent_repository_.consentrepository.md)                    |
+| `creatives`      | [CreativesRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_creatives_repository_.creativesrepository.md)              |
+| `direct`         | [DirectRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_direct_repository_.directrepository.md)                       |
+| `directThread`   | [DirectThreadRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_direct_thread_repository_.directthreadrepository.md)    |
+| `discover`       | [DiscoverRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_discover_repository_.discoverrepository.md)                 |
+| `fbsearch`       | [FbsearchRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_fbsearch_repository_.fbsearchrepository.md)                 |
+| `friendship`     | [FriendshipRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_friendship_repository_.friendshiprepository.md)           |
+| `launcher`       | [LauncherRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_launcher_repository_.launcherrepository.md)                 |
+| `linkedAccount`  | [LinkedAccountRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_linked_account_repository_.linkedaccountrepository.md) |
+| `live`           | [LiveRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_live_repository_.liverepository.md)                             |
+| `location`       | [LocationRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_location_repository_.locationrepository.md)                 |
+| `locationSearch` | [LocationSearch](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_location_search_repository_.locationsearch.md)                  |
+| `loom`           | [LoomRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_loom_repository_.loomrepository.md)                             |
+| `media`          | [MediaRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_media_repository_.mediarepository.md)                          |
+| `music`          | [MusicRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_music_repository_.musicrepository.md)                          |
+| `news`           | [NewsRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_news_repository_.newsrepository.md)                             |
+| `qe`             | [QeRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_qe_repository_.qerepository.md)                                   |
+| `qp`             | [QpRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_qp_repository_.qprepository.md)                                   |
+| `tag`            | [TagRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_tag_repository_.tagrepository.md)                                |
+| `upload`         | [UploadRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_upload_repository_.uploadrepository.md)                       |
+| `user`           | [UserRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_user_repository_.userrepository.md)                             |
+| `zr`             | [ZrRepository](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_repositories_zr_repository_.zrrepository.md)                                   |
 
 ## Services
 
 Services will help you to maintain some actions without calling a couple repositority methods or perform complex things like pre and postlogin flow simulations or photo/video publishing.
 
-| Key | Service class documentation |
-| --- | --- |
-| `publish` | [PublishService](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_services_publish_service_.publishservice.md) |
-| `search` | [SearchService](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_services_search_service_.searchservice.md) |
+| Key        | Service class documentation                                                                                                                |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `publish`  | [PublishService](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_services_publish_service_.publishservice.md)    |
+| `search`   | [SearchService](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_services_search_service_.searchservice.md)       |
 | `simulate` | [SimulateService](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_services_simulate_service_.simulateservice.md) |
-| `story` | [StoryService](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_services_story_service_.storyservice.md) |
+| `story`    | [StoryService](https://github.com/dilame/instagram-private-api/blob/master/docs/classes/_services_story_service_.storyservice.md)          |
 
 # Contribution
 
 If you need features that is not implemented - feel free to implement and create PRs!
 
 Plus we need some documentation, so if you are good in it - you are welcome.
+
+Setting up your environment is described [here](CONTRIBUTING.md).
 
 # Useful links
 
@@ -143,10 +160,3 @@ Plus we need some documentation, so if you are good in it - you are welcome.
 ## Thanks to contributors
 
 - [Nerixyz](https://github.com/Nerixyz), for writing a huge amount of code for this library.
-
-## End User License Agreement (EULA)
-
-1. _You will not use_ this repository for sending mass spam or any other malicious activity
-2. _We / You will not support_ anyone who is violating this EULA conditions
-3. _Repository is just for learning / personal purposes_ thus should not be part of any
-   service available on the Internet that is trying to do any malicious activity (mass bulk request, spam etc.)

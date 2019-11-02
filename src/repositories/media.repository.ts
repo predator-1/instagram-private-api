@@ -167,10 +167,12 @@ export class MediaRepository extends Repository {
   public async comment({
     mediaId,
     text,
+    replyToCommentId,
     module = 'self_comments_v2',
   }: {
     mediaId: string;
     text: string;
+    replyToCommentId?: string;
     module?: string;
   }) {
     const { body } = await this.client.request.send<MediaRepositoryCommentResponse>({
@@ -186,9 +188,36 @@ export class MediaRepository extends Repository {
         _uuid: this.client.state.uuid,
         comment_text: text,
         containermodule: module,
+        replied_to_comment_id: replyToCommentId,
       }),
     });
     return body.comment;
+  }
+
+  async commentsDisable(mediaId) {
+    const { body } = await this.client.request.send({
+      url: `/api/v1/media/${mediaId}/disable_comments/`,
+      method: 'POST',
+      form: this.client.request.sign({
+        _csrftoken: this.client.state.cookieCsrfToken,
+        _uid: this.client.state.cookieUserId,
+        _uuid: this.client.state.uuid,
+      }),
+    });
+    return body;
+  }
+
+  async commentsEnable(mediaId) {
+    const { body } = await this.client.request.send({
+      url: `/api/v1/media/${mediaId}/enable_comments/`,
+      method: 'POST',
+      form: this.client.request.sign({
+        _csrftoken: this.client.state.cookieCsrfToken,
+        _uid: this.client.state.cookieUserId,
+        _uuid: this.client.state.uuid,
+      }),
+    });
+    return body;
   }
 
   public async likers(id: string): Promise<MediaRepositoryLikersResponseRootObject> {
@@ -394,7 +423,6 @@ export class MediaRepository extends Repository {
       width,
       height,
 
-      upload_id: Date.now().toString(),
       source_type: '3',
       configure_mode: '1',
       client_shared_at: now.toString(),
@@ -409,6 +437,11 @@ export class MediaRepository extends Repository {
 
     if (form.configure_mode === '1') {
       MediaRepository.stringifyStoryStickers(form);
+    } else if (form.configure_mode === '2') {
+      if (typeof form.recipient_users !== 'string') {
+        form.recipient_users = JSON.stringify(form.recipient_users ? [form.recipient_users.map(x => Number(x))] : []);
+      }
+      form.thread_ids = JSON.stringify(form.thread_ids || []);
     }
 
     const { body } = await this.client.request.send({
@@ -456,6 +489,11 @@ export class MediaRepository extends Repository {
 
     if (form.configure_mode === '1') {
       MediaRepository.stringifyStoryStickers(form);
+    } else if (form.configure_mode === '2') {
+      if (typeof form.recipient_users !== 'string') {
+        form.recipient_users = JSON.stringify(form.recipient_users ? [form.recipient_users.map(x => Number(x))] : []);
+      }
+      form.thread_ids = JSON.stringify(form.thread_ids || []);
     }
     const { body } = await this.client.request.send({
       url: '/api/v1/media/configure_to_story/',
