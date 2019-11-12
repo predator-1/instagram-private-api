@@ -623,4 +623,62 @@ export class MediaRepository extends Repository {
     });
     return body;
   }
+
+  public async votePollStory(storyId: string, pollId: string, votingOption: string) {
+    const { body } = await this.client.request.send<StatusResponse>({
+      url: `/api/v1/media/${storyId}/${pollId}/story_poll_vote/`,
+      method: 'POST',
+      form: this.client.request.sign({
+        _uuid: this.client.state.uuid,
+        _uid: this.client.state.cookieUserId,
+        _csrftoken: this.client.state.cookieCsrfToken,
+        device_id: this.client.state.deviceId,
+        vote: votingOption,
+      }),
+    });
+    return body;
+  }
+
+  public async voteSliderStory(storyId: string, sliderId: string, votingOption: number) {
+    const { body } = await this.client.request.send<StatusResponse>({
+      url: `/api/v1/media/${storyId}/${sliderId}/story_slider_vote/`,
+      method: 'POST',
+      form: this.client.request.sign({
+        _uuid: this.client.state.uuid,
+        _uid: this.client.state.cookieUserId,
+        _csrftoken: this.client.state.cookieCsrfToken,
+        device_id: this.client.state.deviceId,
+        vote: votingOption,
+      }),
+    });
+    return body;
+  }
+
+  public async voteQuizStory(storyPk: string, quizId: string, votingOption: number) {
+    const { body } = await this.client.request.send<StatusResponse>({
+      url: `/api/v1/media/${storyPk}/${quizId}/story_quiz_answer/`,
+      method: 'POST',
+      form: {
+        _uuid: this.client.state.uuid,
+        _csrftoken: this.client.state.cookieCsrfToken,
+        answer: votingOption,
+      },
+    });
+    return body;
+  }
+
+  public async answerQuestionStory(storyId: string, questionId: string, answer: string) {
+    const { body } = await this.client.request.send<StatusResponse>({
+      url: `/api/v1/media/${storyId}/${questionId}/story_question_responses/`,
+      method: 'POST',
+      form: this.client.request.sign({
+        _uuid: this.client.state.uuid,
+        _uid: this.client.state.cookieUserId,
+        _csrftoken: this.client.state.cookieCsrfToken,
+        device_id: this.client.state.deviceId,
+        response: answer,
+      }),
+    });
+    return body;
+  }
 }

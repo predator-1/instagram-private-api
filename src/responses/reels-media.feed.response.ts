@@ -73,6 +73,9 @@ export interface ReelsMediaFeedResponseItem {
   link_text?: string;
   story_cta?: ReelsMediaFeedResponseStoryCtaItem[];
   imported_taken_at?: number;
+  story_polls?: StoryPollResponseItem[];
+  story_sliders?: StorySlidersrResponseItem[];
+  story_quizs?: StoryQuizsResponseItem[];
 }
 export interface ReelsMediaFeedResponseImageVersions2 {
   candidates: ReelsMediaFeedResponseCandidatesItem[];
@@ -114,4 +117,53 @@ export interface ReelsMediaFeedResponseLinksItem {
   leadGenFormId: string;
   igUserId: string;
   appInstallObjectiveInvalidationBehavior: null;
+}
+
+export interface StoryPollResponseItem extends ReelsMediaFeedResponseReelMentionsItem {
+  is_sticker: number;
+  poll_sticker: PollStickerResponseItem;
+}
+
+export interface PollStickerResponseItem {
+  is_shared_result: boolean;
+  poll_id: string;
+  promotion_tallies: any;
+  question: string;
+  viewer_can_vote: boolean;
+  tallies: TalliesPollStickerResponseItem[];
+}
+
+export interface TalliesPollStickerResponseItem {
+  count: number;
+  font_size?: number;
+  text: string;
+}
+
+export interface SliderStickerResponseItem {
+  slider_id: string;
+  slider_vote_average: any;
+  slider_vote_count: number;
+  text_color: string;
+  viewer_can_vote: boolean;
+}
+
+export interface StorySlidersrResponseItem extends ReelsMediaFeedResponseReelMentionsItem {
+  is_sticker: number;
+  slider_sticker: SliderStickerResponseItem;
+}
+
+export interface StoryQuizsResponseItem extends ReelsMediaFeedResponseReelMentionsItem {
+  is_sticker: number;
+  quiz_sticker: QuizStickerResponseItem;
+}
+
+export interface QuizStickerResponseItem {
+  correct_answer: number;
+  end_background_color: string;
+  finished: boolean;
+  id: string;
+  question: string;
+  quiz_id: string;
+  start_background_color: string;
+  tallies: TalliesPollStickerResponseItem[];
 }

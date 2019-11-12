@@ -44,4 +44,16 @@ export class StoryService extends Repository {
 
     return this.client.media.seen(reels);
   }
+
+  public votePollStory(storyId: string, pollId: string, votingOption: string) {
+    return this.client.media.votePollStory(storyId, pollId, votingOption);
+  }
+
+  public voteSliderStory(storyId: string, sliderId: string, votingOption: number) {
+    return this.client.media.voteSliderStory(storyId, sliderId, votingOption);
+  }
+
+  public voteQuizStory(storyPk: string, quizId: string, votingOption: number) {
+    return this.client.media.voteQuizStory(storyPk, quizId, votingOption);
+  }
 }
