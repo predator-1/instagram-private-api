@@ -1,7 +1,6 @@
 import { defaultsDeep, inRange, random } from 'lodash';
 import { createHmac } from 'crypto';
 import { Subject } from 'rxjs';
-import { AttemptOptions, retry } from '@lifeomic/attempt';
 import { IgApiClient } from './client';
 import {
   IgActionSpamError,
@@ -53,15 +52,14 @@ interface SignedPost {
 export class Request {
   end$ = new Subject();
   error$ = new Subject<IgClientError>();
-  attemptOptions: Partial<AttemptOptions<any>> = {
-    maxAttempts: 1,
-  };
   defaults: Partial<GotBodyOptions<string>> = {
     baseUrl: 'https://i.instagram.com/',
     rejectUnauthorized: false,
     decompress: false,
     headers: this.getDefaultHeaders(),
     throwHttpErrors: false,
+    timeout: 15000,
+    retry: 1,
     hooks: {
       afterResponse: [
         response => {
@@ -218,9 +216,9 @@ export class Request {
     return new IgResponseError(response);
   }
 
-  private async faultTolerantRequest(url: string, options: GotOptions<string>) {
+  private async faultTolerantRequest<T = any>(url: string, options: GotOptions<any>): Promise<any> {
     try {
-      return await retry(async () => got(url, options), this.attemptOptions);
+      return await got(url, options);
     } catch (err) {
       throw new IgNetworkError(err);
     }
